@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q3Seatwork2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        
+        .main-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 900px;
+        }
+        
+        .budget-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .budget-input {
+            background: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 250px;
+            font-size: 16px;
+            margin: 15px 0;
+        }
+        
+        .brand-btn {
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .brand-btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .brand-btn.selected {
+            background: #f5576c;
+        }
+        
+        .store-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        
+        .store-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .discount-display {
+            background: #fa709a;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        
+        .find-btn {
+            background: #00c9ff;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .find-btn:hover {
+            background: #00b3e6;
+        }
+        
+        .result-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <div class="text-center">
+                <h1>Product Locator</h1>
+            </div>
+            <div class="budget-section">
+                <h2 class="mb-3">Want a gaming laptop? Enter your budget and let's find the right one for you!</h2>
+                <input type="number" class="budget-input" id="budgetInput" placeholder="Enter your budget here...">
+                <br>
+                <button class="find-btn" onclick="findProducts()">Find Products</button>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div>
+                        <h3>Brand & Discounts</h3>
+                        <h4>Recommended Brands</h4>
+                        <div id="brandButtons">
+                            <button class="brand-btn" onclick="selectBrand('Acer')">Acer</button>
+                            <button class="brand-btn" onclick="selectBrand('Asus')">Asus</button>
+                            <button class="brand-btn" onclick="selectBrand('Lenovo')">Lenovo</button>
+                            <button class="brand-btn" onclick="selectBrand('MSI')">MSI</button>
+                            <button class="brand-btn" onclick="selectBrand('Dell')">Dell</button>
+                        </div>
+                        <div class="discount-display">
+                            You are eligible for: ₱<span id="discountAmount">0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div>
+                        <h3>Store Location</h3>
+                        <div class="store-card" onclick="selectStore('VillMan Computers')">
+                            <h5>VillMan Computers</h5>
+                            <p>123 Tech Street, Cyber City</p>
+                        </div>
+                        <div class="store-card" onclick="selectStore('Silicon Valley')">
+                            <h5>Silicon Valley</h5>
+                            <p>456 Innovation Road, Digital District</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <h3>Recommended Products</h3>
+                <div id="productResults"></div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p>
+                    Need more information? Visit our 
+                    <a href="https://www.example.com/gaming-laptops" target="_blank">
+                        complete gaming laptop guide
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedBrand = '';
+        let selectedStore = '';
+        let userBudget = 0;
+        let currentDiscount = 0;
+
+        const products = {
+            'Acer': [
+                { name: 'Acer Nitro 5', price: 45000 },
+                { name: 'Acer Predator Helios 300', price: 65000 }
+            ],
+            'Asus': [
+                { name: 'ASUS TUF Gaming F15', price: 50000 },
+                { name: 'ASUS ROG Strix G15', price: 75000 }
+            ],
+            'Lenovo': [
+                { name: 'Lenovo Legion 5', price: 60000 },
+                { name: 'Lenovo IdeaPad Gaming 3', price: 40000 }
+            ],
+            'MSI': [
+                { name: 'MSI GF63 Thin', price: 42000 },
+                { name: 'MSI Katana GF66', price: 55000 }
+            ],
+            'Dell': [
+                { name: 'Dell G15', price: 48000 },
+                { name: 'Dell Alienware m15', price: 90000 }
+            ]
+        };
+        
+        function selectBrand(brand) {
+            document.querySelectorAll('.brand-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            selectedBrand = brand;
+            calculateDiscount(brand);
+        }
+        
+        function calculateDiscount(brand) {
+            if (brand === 'Acer') currentDiscount = 2000;
+            else if (brand === 'Asus') currentDiscount = 3000;
+            else if (brand === 'Lenovo') currentDiscount = 2500;
+            else if (brand === 'MSI') currentDiscount = 3500;
+            else if (brand === 'Dell') currentDiscount = 4000;
+            else currentDiscount = 0;
+            
+            document.getElementById('discountAmount').textContent = currentDiscount.toFixed(2);
+        }
+        
+        function selectStore(store) {
+            selectedStore = store;
+            document.querySelectorAll('.store-card').forEach(card => {
+                card.style.background = 'rgba(255, 255, 255, 0.1)';
+            });
+            event.currentTarget.style.background = 'rgba(0, 201, 255, 0.2)';
+        }
+        
+        function findProducts() {
+            userBudget = parseFloat(document.getElementById('budgetInput').value);
+            
+            if (isNaN(userBudget) || userBudget <= 0) {
+                alert('Please enter a valid budget!');
+                return;
+            }
+            
+            if (selectedBrand === '') {
+                alert('Please select a brand!');
+                return;
+            }
+            
+            const availableProducts = products[selectedBrand].filter(product => {
+                return (product.price - currentDiscount) <= userBudget;
+            });
+            
+            displayResults(availableProducts);
+        }
+        
+        function displayResults(products) {
+            const resultSection = document.getElementById('resultSection');
+            const productResults = document.getElementById('productResults');
+            
+            productResults.innerHTML = '';
+            
+            if (products.length === 0) {
+                productResults.innerHTML = '<p>No products found within your budget.</p>';
+            } else {
+                products.forEach(product => {
+                    const finalPrice = product.price - currentDiscount;
+                    productResults.innerHTML += `
+                        <div class="result-item">
+                            <h5>${product.name}</h5>
+                            <p>Original Price: ₱${product.price.toLocaleString()}</p>
+                            <p>Discounted Price: ₱${finalPrice.toLocaleString()}</p>
+                            ${selectedStore ? `<p>Available at: ${selectedStore}</p>` : ''}
+                        </div>
+                    `;
+                });
+            }
+            
+            resultSection.style.display = 'block';
+        }
+        
+    </script>
+</body>
+</html>
